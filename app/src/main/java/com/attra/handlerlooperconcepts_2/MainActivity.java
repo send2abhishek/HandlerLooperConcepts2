@@ -1,5 +1,6 @@
 package com.attra.handlerlooperconcepts_2;
 
+import android.app.ProgressDialog;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -10,19 +11,23 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     private TextView mainText;
     private Handler handler;
+    private ProgressDialog dialog;
 // we are trying to send message from background thread to main Thread
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainText=findViewById(R.id.activity_main_text);
-
+        dialog=new ProgressDialog(this);
+        dialog.setMessage("Operation in progress");
+        dialog.setTitle("Please Wait");
+        dialog.setCancelable(false);
         //Handler class reference will persist till activity persist in the memory
        handler=new Handler(getMainLooper()){
 
            @Override
            public void handleMessage(Message msg) {
-
+               dialog.hide();
                String data=msg.getData().getString("MSG-DATA");
                mainText.setText(data);
            }
@@ -30,29 +35,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void RunCode(View view) {
+        dialog.show();
 
-        Runnable runnable=new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    Thread.sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                Bundle bundle=new Bundle();
-                bundle.putString("MSG-DATA","Data Received from background thread");
-
-                Message message=new Message();
-                message.setData(bundle);
-
-                handler.sendMessage(message);
-            }
-        };
 
         // Created the background thread
-        Thread thread=new Thread(runnable);
+        Thread thread=new SongThread(handler);
         thread.setName("My Thread 1");
         thread.start();
     }
