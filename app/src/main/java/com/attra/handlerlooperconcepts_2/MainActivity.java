@@ -10,8 +10,10 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
     private TextView mainText;
-    private Handler handler;
+    public static Handler handler;
     private ProgressDialog dialog;
+    private String songs[] ={"Song1","Song2","Song3"};
+    private SongThread songThread;
 // we are trying to send message from background thread to main Thread
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,26 +24,41 @@ public class MainActivity extends AppCompatActivity {
         dialog.setMessage("Operation in progress");
         dialog.setTitle("Please Wait");
         dialog.setCancelable(false);
-        //Handler class reference will persist till activity persist in the memory
-       handler=new Handler(getMainLooper()){
 
-           @Override
-           public void handleMessage(Message msg) {
-               dialog.hide();
-               String data=msg.getData().getString("MSG-DATA");
-               mainText.setText(data);
-           }
-       };
+       // mainText.setText(data);
+
+        handler=new Handler(){
+
+            @Override
+            public void handleMessage(Message msg) {
+
+                dialog.hide();
+                mainText.setText(msg.getData().getString("MSG-KEY"));
+
+            }
+        };
+
+
+        // Created the background thread
+        songThread=new SongThread();
+        songThread.setName("My Thread 1");
+        songThread.start();
     }
+
+
 
     public void RunCode(View view) {
         dialog.show();
 
+        for(String song:songs){
 
-        // Created the background thread
-        Thread thread=new SongThread(handler);
-        thread.setName("My Thread 1");
-        thread.start();
+            // creates the reusable object of message class
+            Message msg=Message.obtain();
+            msg.obj=song;
+            // sending data to message queue
+            songThread.handler.sendMessage(msg);
+        }
+
     }
 
 

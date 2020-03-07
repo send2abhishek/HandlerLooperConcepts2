@@ -1,39 +1,28 @@
 package com.attra.handlerlooperconcepts_2;
 
-import android.os.Bundle;
+
+
 import android.os.Handler;
-import android.os.Message;
+import android.os.Looper;
+
 
 public class SongThread extends Thread {
 
-    private Handler handler;
-    private String songs[] ={"Song1","Song2","Song3"};
+    public Handler handler;
 
-    public SongThread(Handler handler) {
-       this.handler=handler;
-    }
+
 
     @Override
     public void run() {
 
-        for(String song:songs){
-            SongDownload(song);
-        }
+        //creates the looper and Message Queue for the background thread
+        Looper.prepare();
+        handler=new DownloadHandler();
+
+        // it will loop the looper, means it will take one task at once and pass to the download handler class
+        Looper.loop();
 
     }
 
-    private void SongDownload(String song){
 
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        Bundle bundle=new Bundle();
-        bundle.putString("MSG-DATA",song);
-        Message msg=new Message();
-        msg.setData(bundle);
-        handler.sendMessage(msg);
-    }
 }
