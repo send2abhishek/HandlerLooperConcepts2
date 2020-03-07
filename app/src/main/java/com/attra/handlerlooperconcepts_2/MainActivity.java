@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
        // mainText.setText(data);
 
-        handler=new Handler(){
+        handler=new Handler(getMainLooper()){
 
             @Override
             public void handleMessage(Message msg) {
